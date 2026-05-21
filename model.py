@@ -4,57 +4,15 @@ import torch.nn.functional as F
 import math
 from model_gcn import GCN
 
-# iemocap_similarity_matrix = torch.tensor([
-#     [1.0, 0.3, 0.5, 0.2, 0.8, 0.5],  # happy
-#     [0.3, 1.0, 0.6, 0.7, 0.4, 0.9],  # sad
-#     [0.5, 0.6, 1.0, 0.4, 0.5, 0.5],  # neutral
-#     [0.2, 0.7, 0.4, 1.0, 0.3, 0.8],  # angry
-#     [0.8, 0.4, 0.5, 0.3, 1.0, 0.6],  # excited
-#     [0.5, 0.9, 0.5, 0.8, 0.6, 1.0]   # frustrated
-# ], dtype=torch.float32)
 
-#
 iemocap_similarity_matrix = torch.tensor([
-    [1.0, 0.3, 0.4, 0.2, 0.6, 0.3],  # happy
-    [0.3, 1.0, 0.4, 0.7, 0.4, 0.6],  # sad
-    [0.2, 0.5, 1.0, 0.4, 0.5, 0.2],  # neutral
-    [0.2, 0.7, 0.4, 1.0, 0.3, 0.5],  # angry
-    [0.6, 0.4, 0.5, 0.3, 1.0, 0.4],  # excited
-    [0.3, 0.8, 0.3, 0.5, 0.4, 1.0]   # frustrated
-], dtype=torch.float32)
-# iemocap_similarity_matrix = torch.tensor([
-#     [1.000, 0.567, 0.667, 0.739, 0.970, 0.657],  # happy
-#     [0.567, 1.000, 0.886, 0.725, 0.534, 0.799],  # sad
-#     [0.667, 0.886, 1.000, 0.712, 0.650, 0.768],  # neutral
-#     [0.739, 0.725, 0.712, 1.000, 0.725, 0.824],  # angry
-#     [0.970, 0.534, 0.650, 0.725, 1.000, 0.599],  # excited
-#     [0.657, 0.799, 0.768, 0.824, 0.599, 1.000]   # frustrated
-# ], dtype=torch.float32)
-meld_similarity_matrix = torch.tensor([
-    [1.0, 0.3, 0.4, 0.2, 0.6, 0.3],  # happy
-    [0.3, 1.0, 0.4, 0.7, 0.4, 0.6],  # sad
-    [0.2, 0.5, 1.0, 0.4, 0.5, 0.2],  # neutral
-    [0.2, 0.7, 0.4, 1.0, 0.3, 0.5],  # angry
-    [0.6, 0.4, 0.5, 0.3, 1.0, 0.4],  # excited
-    [0.3, 0.8, 0.3, 0.5, 0.4, 1.0]   # frustrated
-], dtype=torch.float32)
-
-# iemocap_similarity_matrix_new = torch.tensor([
-#     [1.0000, 0.5913, 0.9622, 0.6478, 0.9873, 0.3891],  # happy
-#     [0.5913, 1.0000, 0.2541, 1.0000, 0.7266, 0.9869],  # sad
-#     [0.9622, 0.2541, 1.0000, 0.3417, 0.8625, 0.0000],  # neutral
-#     [0.6478, 1.0000, 0.3417, 1.0000, 0.7373, 0.9250],  # angry
-#     [0.9873, 0.7266, 0.8625, 0.7373, 1.0000, 0.5806],  # excited
-#     [0.3891, 0.9869, 0.0000, 0.9250, 0.5806, 1.0000]   # frustrated
-# ], dtype=torch.float32)  # 归一化后 73.66 73.44
-iemocap_similarity_matrix_new = torch.tensor([
-    [1.0000, 0.8112, 0.9809, 0.8507, 0.9692, 0.7216],  # happy
-    [0.8112, 1.0000, 0.6562, 0.9915, 0.8483, 0.9915],  # sad
-    [0.9809, 0.6562, 1.0000, 0.7054, 0.9079, 0.5420],  # neutral
-    [0.8507, 0.9915, 0.7054, 1.0000, 0.8658, 0.9714],  # angry
-    [0.9692, 0.8483, 0.9079, 0.8658, 1.0000, 0.7841],  # excited
-    [0.7216, 0.9915, 0.5420, 0.9714, 0.7841, 1.0000]   # frustrated
-], dtype=torch.float32)   # 归一化前
+    [1.0000, 0.5913, 0.9622, 0.6478, 0.9873, 0.3891],  # happy
+    [0.5913, 1.0000, 0.2541, 1.0000, 0.7266, 0.9869],  # sad
+    [0.9622, 0.2541, 1.0000, 0.3417, 0.8625, 0.0000],  # neutral
+    [0.6478, 1.0000, 0.3417, 1.0000, 0.7373, 0.9250],  # angry
+    [0.9873, 0.7266, 0.8625, 0.7373, 1.0000, 0.5806],  # excited
+    [0.3891, 0.9869, 0.0000, 0.9250, 0.5806, 1.0000]   # frustrated
+], dtype=torch.float32)  
 
 meld_similarity_matrix = torch.tensor([
     [1.0000, 0.8756, 0.0000, 0.2662, 0.9425, 0.0086, 0.3716],  # Neutral
@@ -80,7 +38,7 @@ class VGSRLoss(nn.Module):
         :param similarity_matrix: 各类别之间的相似性矩阵
         """
         if dataset == "IEMOCAP":
-            matrix = iemocap_similarity_matrix_new
+            matrix = iemocap_similarity_matrix
         elif dataset == "MELD":
             matrix = meld_similarity_matrix
         similarity_matrix = matrix.to(labels.device)
