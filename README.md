@@ -1,15 +1,15 @@
-# A Global-Local Fusion Network with Similarity-Aware Focal Self-Distillation for Multimodal Emotion Recognition in Conversations
+# VGLIN: A VAD-Guided Global-Local Interaction Network for Multimodal Emotion Recognition in Conversations
 
 ## 🛠️ Setup
 
 ### Preparing the Code and Data
-download them from https://anonymous.4open.science/r/SAFSD-GLNetwork.
+
 
 ### Preparing the Environment
 ```bash
-conda create -n SAFSD-GLNet python==3.8
-cd SAFSD-GLNet
-conda activate SAFSD-GLNet
+conda create -n VGLIN python==3.8
+cd VGLIN
+conda activate VGLIN
 ```
 - Check the packages needed or simply run the command:
 ```console
