@@ -140,9 +140,6 @@ def train_or_eval_model(model, loss_function, kl_loss, dataloader, epoch, datase
             loss_function_1 = nn.NLLLoss(loss_weights.to(torch.device("cuda:0")) if cuda else loss_weights)  # IEMOCAP
         else:
             loss_function_1 = nn.NLLLoss()  # MELD
-        # loss = gamma_1 * loss_function(lp_all, labels_, umask) + \
-        #         gamma_2 * (loss_function(lp_1, labels_, umask) + loss_function(lp_2, labels_, umask) + loss_function(lp_3, labels_, umask)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all, umask) + kl_loss(kl_lp_2, kl_p_all, umask) + kl_loss(kl_lp_3, kl_p_all, umask))
 
         loss_function_g = VGSRLoss()
         # print("label.shape", label.shape)  # ([16, 74])
@@ -158,101 +155,6 @@ def train_or_eval_model(model, loss_function, kl_loss, dataloader, epoch, datase
         # print("umask", umask.shape)  # ([16, 110])
 
         # print("kl_lp_1", kl_lp_1.shape)  # ([1152, 6])
-
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #         gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3, labels_)) + \
-        #         gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3, kl_p_all))  # 73.25 72.95 (68/70)
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.76 73.51 (58/90)
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 72.67 72.40 (87/100)
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.45 73.14  (59/80)
-        # queding90
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 72.47  (50/90) 2.0
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.76 73.44 (50/90) 1.1
-        # + feature GCN
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  #  (/90) 1.0
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.03 72.77 (79/90) 1.0
-        # + 全部
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.57 73.44 (79/90) 1.0
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.11 72.95 (68/90) 1.0  0.1
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.37 73.01 (73/90) 1.1
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 72.68 72.40 (52/90) 2.0
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 71.49 71.23 (75/90) 3.0
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.15  72.89(61/90) 0.9
-        # 去self.alpha
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.68 73.51 (80/90) 1.0 一位小数矩阵
-        # 换矩阵（两个公式）
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.66 73.44 (80/90) 1.0 归一化后
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_) + loss_function_g(lp_2, labels_) + loss_function_g(lp_3,
-        #                                                                                                     labels_)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 73.5 73.32 (57/90) 1.0 归一化前
-        # meld---------------
-        # loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
-        #        gamma_2 * (loss_function_g(lp_1, labels_, dataset) + loss_function_g(lp_2, labels_, dataset) + loss_function_g(lp_3,
-        #                                                                                                     labels_, dataset)) + \
-        #        gamma_3 * (kl_loss(kl_lp_1, kl_p_all) + kl_loss(kl_lp_2, kl_p_all) + kl_loss(kl_lp_3,
-        #                                                                                     kl_p_all))  # 65.04 67.16 (10/90) 1.0
         loss = gamma_1 * loss_function_1(all_log_prob, label_g) + \
                gamma_2 * (loss_function_g(lp_1, labels_, dataset) + loss_function_g(lp_2, labels_,
                                                                                     dataset) + loss_function_g(lp_3,
@@ -478,58 +380,6 @@ if __name__ == '__main__':
     # print('ACC: {}'.format(max(all_acc)))
     print('index: {}'.format(all_fscore.index(max(all_fscore)) + 1))
 
-    # 4. 这段代码是用来记录模型的性能指标到一个文件中，以便后续分析和比较。它使用了 Python 的 pickle 模块来序列化和反序列化数据
-    # 检查指定日期的记录文件是否存在
-    if not os.path.exists("record_{}_{}_{}.pk".format(today.year, today.month, today.day)):
-        # 如果文件不存在，打开文件以写入二进制模式
-        with open("record_{}_{}_{}.pk".format(today.year, today.month, today.day),'wb') as f:
-            # 将一个空字典序列化到文件中
-            pk.dump({}, f)
-    # 打开文件以读取二进制模式
-    with open("record_{}_{}_{}.pk".format(today.year, today.month, today.day), 'rb') as f:
-        record = pk.load(f)
 
-    # 定义一个键，用于在 record 字典中存储数据
-    key_ = 'name_'
-    if record.get(key_, False):
-        # 如果键存在，将最高的 F-Score 添加到对应的列表中
-        record[key_].append(max(all_fscore))
-    else:
-        # 如果键不存在，创建一个新的列表，并添加最高的 F-Score
-        record[key_] = [max(all_fscore)]
-
-    if record.get(key_+'record', False):
-        # 如果键存在，将分类报告添加到对应的列表中
-        # record[key_+'record'].append(classification_report(best_label, best_pred, sample_weight=best_mask,digits=4))
-        record[key_ + 'record'].append(classification_report(best_label, best_pred, digits=4))
-    else:
-        # 如果键不存在，创建一个新的列表，并添加分类报告
-        # record[key_+'record'] = [classification_report(best_label, best_pred, sample_weight=best_mask,digits=4)]
-        record[key_ + 'record'] = [classification_report(best_label, best_pred, digits=4)]
-    # 再次打开文件以写入二进制模式
-    with open("record_{}_{}_{}.pk".format(today.year, today.month, today.day),'wb') as f:
-        # 将更新后的 record 字典序列化回文件
-        pk.dump(record, f)
-
-    # 打印分类报告和混淆矩阵
-    # print(classification_report(best_label, best_pred, sample_weight=best_mask, digits=4))
-    # print(confusion_matrix(best_label, best_pred, sample_weight=best_mask))
-
-    print(classification_report(best_label, best_pred, digits=4))
-    # 单个类别的acc和recall一样
-    print(confusion_matrix(best_label, best_pred))
-    # confuPLT(confusion_matrix(best_label, best_pred, sample_weight=best_mask).astype(int), args.Dataset)
-    # confuPLT(confusion_matrix(best_label, best_pred).astype(int), args.Dataset)
-    #
-    # # 获取混淆矩阵
-    # conf_matrix = confusion_matrix(best_label, best_pred)
-    #
-    # # 计算每个类别的准确率
-    # # 例如，准确率 = 每个类别的正确预测数 / 该类别的总样本数
-    # accuracies = np.diag(conf_matrix) / np.sum(conf_matrix, axis=1)
-    #
-    # # 输出每个类别的准确率
-    # for i, acc in enumerate(accuracies):
-    #     print(f'Class {i} Accuracy: {acc:.4f}')
 
 
