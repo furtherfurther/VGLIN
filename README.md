@@ -2,8 +2,6 @@
 
 ## 🛠️ Setup
 
-### Preparing the Code and Data
-
 
 ### Preparing the Environment
 ```bash
